@@ -1,4 +1,16 @@
-# ServerKit
+<p align="center">
+  <img src="logo/serverkit-banner.svg" alt="ServerKit" width="800" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-f97316?style=flat-square" alt="version" />
+  <img src="https://img.shields.io/badge/license-MIT-388bfd?style=flat-square" alt="license" />
+  <img src="https://img.shields.io/badge/node-%3E%3D18-56d364?style=flat-square&logo=node.js&logoColor=white" alt="node" />
+  <img src="https://img.shields.io/badge/platform-Linux-8b949e?style=flat-square&logo=linux&logoColor=white" alt="platform" />
+  <img src="https://img.shields.io/badge/Next.js-15-white?style=flat-square&logo=next.js&logoColor=black" alt="nextjs" />
+</p>
+
+<br />
 
 A self-hosted Linux server management panel built for homelab and personal server environments. ServerKit consolidates everything you need into a single, browser-based interface — real-time resource monitoring, Docker container management, file browsing, firewall control, S3 object storage, and a full browser terminal — all protected behind a secure, password-authenticated session.
 
@@ -111,6 +123,10 @@ For full prerequisites, environment variable reference, and production deploymen
 
 ---
 
+## Author
+
+**Moniruzzaman Shawon** — [m.zaman.djp@gmail.com](mailto:m.zaman.djp@gmail.com)
+
 ## License
 
-MIT
+MIT © 2026 Moniruzzaman Shawon — see [LICENSE](LICENSE) for details.

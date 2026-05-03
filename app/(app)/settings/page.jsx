@@ -328,7 +328,7 @@ function AboutTab() {
           browse files, monitor resources, and access a full terminal — all from your browser.
         </p>
         <div className="mt-3 flex items-center gap-2">
-          <span className="text-2xs font-mono text-sk-faint">MIT License · v1.0.0</span>
+          <span className="text-2xs font-mono text-sk-faint">MIT License · © 2026 Moniruzzaman Shawon · v1.0.0</span>
         </div>
       </SectionCard>
     </div>
