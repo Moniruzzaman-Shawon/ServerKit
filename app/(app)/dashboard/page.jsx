@@ -19,12 +19,27 @@ const MODULES = [
 
 export default function DashboardPage() {
   const { stats, history } = useStats()
-  const [activity, setActivity] = useState([])
+  const [activity,    setActivity]    = useState([])
   const [dockerStats, setDockerStats] = useState(null)
+  const [thermal,     setThermal]     = useState(null)
 
   useEffect(() => {
     fetch('/api/activity').then(r => r.json()).then(setActivity).catch(() => {})
     fetch('/api/docker/summary').then(r => r.json()).then(setDockerStats).catch(() => {})
+  }, [])
+
+  // Poll thermal data every 3 s (independent of WebSocket)
+  const [tempHistory, setTempHistory] = useState(Array(20).fill(0))
+  useEffect(() => {
+    function load() {
+      fetch('/api/stats/thermal').then(r => r.json()).then(d => {
+        setThermal(d)
+        setTempHistory(prev => [...prev.slice(-19), d.cpu ?? 0])
+      }).catch(() => {})
+    }
+    load()
+    const t = setInterval(load, 3000)
+    return () => clearInterval(t)
   }, [])
 
   const mediaDisk = stats?.disks?.find(d => d.mount.includes('media'))
@@ -35,7 +50,7 @@ export default function DashboardPage() {
     <div className="p-4 lg:p-5 animate-fadein">
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
         <StatCard
           label="CPU"
           value={stats ? `${stats.cpu.load}%` : null}
@@ -65,6 +80,28 @@ export default function DashboardPage() {
           sub={(mediaDisk || webDisk) ? `of ${formatBytes((mediaDisk || webDisk).size)}` : 'Not mounted'}
           pct={(mediaDisk || webDisk)?.pct ?? 0}
           color="#d29922"
+        />
+        <StatCard
+          label="Temperature"
+          value={thermal?.cpu != null ? `${thermal.cpu}°C` : null}
+          sub={thermal?.gpu != null ? `GPU ${thermal.gpu}°C` : (thermal ? 'GPU —' : 'Loading…')}
+          pct={thermal?.cpu != null ? Math.min(100, thermal.cpu) : 0}
+          color={
+            (thermal?.cpu ?? 0) >= 80 ? '#f85149' :
+            (thermal?.cpu ?? 0) >= 60 ? '#d29922' : '#39d353'
+          }
+          spark={tempHistory}
+        />
+        <StatCard
+          label="GPU Power"
+          value={thermal?.gpuWatts != null ? `${thermal.gpuWatts}W` : null}
+          sub={thermal?.gpuWattsCap != null ? `of ${thermal.gpuWattsCap}W cap` : (thermal ? 'No GPU data' : 'Loading…')}
+          pct={
+            thermal?.gpuWatts != null && thermal?.gpuWattsCap
+              ? Math.round((thermal.gpuWatts / thermal.gpuWattsCap) * 100)
+              : 0
+          }
+          color="#bc8cff"
         />
       </div>
 

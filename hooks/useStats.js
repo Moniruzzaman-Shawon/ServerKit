@@ -7,8 +7,9 @@ const HIST = 20
 export function useStats() {
   const [stats, setStats] = useState(null)
   const [history, setHistory] = useState({
-    cpu: Array(HIST).fill(0),
-    ram: Array(HIST).fill(0),
+    cpu:  Array(HIST).fill(0),
+    ram:  Array(HIST).fill(0),
+    temp: Array(HIST).fill(0),
   })
   const [connected, setConnected] = useState(false)
 
@@ -20,8 +21,9 @@ export function useStats() {
     socket.on('stats', data => {
       setStats(data)
       setHistory(prev => ({
-        cpu: [...prev.cpu.slice(-(HIST - 1)), data.cpu.load],
-        ram: [...prev.ram.slice(-(HIST - 1)), data.ram.pct],
+        cpu:  [...prev.cpu.slice(-(HIST - 1)),  data.cpu.load],
+        ram:  [...prev.ram.slice(-(HIST - 1)),  data.ram.pct],
+        temp: [...prev.temp.slice(-(HIST - 1)), data.temp?.cpu ?? 0],
       }))
     })
 
