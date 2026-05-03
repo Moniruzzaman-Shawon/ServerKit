@@ -1,0 +1,21 @@
+services:
+  serverkit:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # Docker management
+      - /mnt/media:/mnt/media:ro                    # Media files (read-only)
+      - /mnt/webserver:/mnt/webserver:ro            # Web server files (read-only)
+      - ./data:/app/data                             # SQLite database
+    environment:
+      - SK_PASSWORD=${SK_PASSWORD:-changeme}
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+      - NEXT_PUBLIC_HOSTNAME=${HOSTNAME:-my-linux-server}
+      - MEDIA_ROOTS=/mnt/media,/mnt/webserver
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT:-http://localhost:9000}
+      - MINIO_USER=${MINIO_USER:-minioadmin}
+      - MINIO_PASS=${MINIO_PASS:-minioadmin}
+      - NODE_ENV=production
+    network_mode: host   # Required to see host ports in Network view

@@ -1,0 +1,16 @@
+{
+  "/api/docker/summary/route": "app/api/docker/summary/route.js",
+  "/api/activity/route": "app/api/activity/route.js",
+  "/api/docker/containers/route": "app/api/docker/containers/route.js",
+  "/api/storage/buckets/route": "app/api/storage/buckets/route.js",
+  "/api/network/firewall/route": "app/api/network/firewall/route.js",
+  "/api/network/ports/route": "app/api/network/ports/route.js",
+  "/api/media/route": "app/api/media/route.js",
+  "/(app)/dashboard/page": "app/(app)/dashboard/page.js",
+  "/(app)/webserver/page": "app/(app)/webserver/page.js",
+  "/(app)/docker/page": "app/(app)/docker/page.js",
+  "/(app)/storage/page": "app/(app)/storage/page.js",
+  "/(app)/network/page": "app/(app)/network/page.js",
+  "/(app)/media/page": "app/(app)/media/page.js",
+  "/(app)/database/page": "app/(app)/database/page.js"
+}
