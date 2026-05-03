@@ -1,21 +1,24 @@
 services:
+
   serverkit:
     build: .
     restart: unless-stopped
-    ports:
-      - "${PORT:-3000}:3000"
+    # No public port binding — Caddy on the host proxies to localhost:3000.
+    # network_mode: host lets the app see real host interfaces for the Network page.
+    network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock   # Docker management
       - /mnt/media:/mnt/media:ro                    # Media files (read-only)
       - /mnt/webserver:/mnt/webserver:ro            # Web server files (read-only)
-      - ./data:/app/data                             # SQLite database
+      - ./data:/app/data                            # SQLite database (settings + activity)
     environment:
-      - SK_PASSWORD=${SK_PASSWORD:-changeme}
-      - JWT_SECRET=${JWT_SECRET:-change-me}
-      - NEXT_PUBLIC_HOSTNAME=${HOSTNAME:-my-linux-server}
-      - MEDIA_ROOTS=/mnt/media,/mnt/webserver
+      - SK_PASSWORD=${SK_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - NEXT_PUBLIC_HOSTNAME=${NEXT_PUBLIC_HOSTNAME:-my-linux-server}
+      - PORT=3000
+      - MEDIA_ROOTS=${MEDIA_ROOTS:-/mnt/media,/mnt/webserver}
+      - DOCKER_SOCKET=${DOCKER_SOCKET:-/var/run/docker.sock}
       - MINIO_ENDPOINT=${MINIO_ENDPOINT:-http://localhost:9000}
       - MINIO_USER=${MINIO_USER:-minioadmin}
       - MINIO_PASS=${MINIO_PASS:-minioadmin}
       - NODE_ENV=production
-    network_mode: host   # Required to see host ports in Network view

@@ -1,0 +1,16 @@
+# ServerKit — Caddy reverse proxy
+# Replace "serverkit.yourdomain.com" with your actual domain.
+# Caddy provisions a Let's Encrypt TLS certificate automatically.
+# Docs: https://caddyserver.com/docs
+
+serverkit.yourdomain.com {
+    reverse_proxy localhost:3000
+
+    # Compress responses
+    encode gzip
+
+    # Strip the Server header so the backend isn't fingerprinted
+    header -Server
+
+    # WebSocket support is automatic in Caddy 2
+}

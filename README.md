@@ -111,6 +111,7 @@ For full prerequisites, environment variable reference, and production deploymen
 | Guide | What it covers |
 |---|---|
 | [Installation](docs/installation.md) | Prerequisites, environment setup, password configuration, first login, production deployment |
+| [Remote Access](docs/remote-access.md) | HTTPS setup with Caddy, domain configuration, access from any device |
 | [Dashboard](docs/dashboard.md) | Real-time stats, module cards, network I/O, activity log |
 | [Docker](docs/docker.md) | Container list, lifecycle actions, log viewer |
 | [Media Server](docs/media-server.md) | File browser, breadcrumb navigation, path allowlist configuration |
