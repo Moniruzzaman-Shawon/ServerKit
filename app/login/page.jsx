@@ -49,7 +49,7 @@ export default function LoginPage() {
       />
 
       {/* Card */}
-      <div className="relative w-[420px] animate-fadein z-10">
+      <div className="relative w-full max-w-[420px] mx-4 animate-fadein z-10">
         {/* Outer glow ring */}
         <div
           className="absolute -inset-px rounded-2xl pointer-events-none"

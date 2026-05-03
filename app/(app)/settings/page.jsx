@@ -358,11 +358,31 @@ export default function SettingsPage() {
   const env = cfg?.env || {}
 
   return (
-    <div className="p-5 animate-fadein">
-      <div className="grid gap-5" style={{ gridTemplateColumns: '180px 1fr' }}>
+    <div className="p-4 lg:p-5 animate-fadein">
 
-        {/* Tab nav */}
-        <div>
+      {/* Mobile: horizontal tab strip */}
+      <div className="flex md:hidden overflow-x-auto gap-1 mb-4 pb-1">
+        {TABS.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`flex items-center gap-1.5 flex-shrink-0 px-3 py-2 rounded-md
+                        text-[12px] border transition-all cursor-pointer
+                        ${tab === id
+                          ? 'bg-sk-orange/8 text-sk-orange border-sk-orange/50'
+                          : 'text-sk-muted border-sk-border hover:bg-sk-el hover:text-sk-text'
+                        }`}
+          >
+            <Icon size={12} className={tab === id ? 'opacity-100' : 'opacity-60'} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-5 grid-cols-1 md:grid-cols-[180px_1fr]">
+
+        {/* Tab nav — desktop sidebar */}
+        <div className="hidden md:block">
           <div className="text-2xs font-medium text-sk-faint uppercase tracking-[.06em] mb-2">
             Settings
           </div>

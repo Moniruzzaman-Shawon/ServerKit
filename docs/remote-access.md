@@ -1,21 +1,73 @@
 # Remote Access
 
-This guide covers everything needed to access ServerKit securely from any device — phone, tablet, laptop, or another PC — from anywhere in the world.
+This guide covers two ways to access ServerKit securely from any device — phone, tablet, laptop, or another PC — from anywhere in the world.
+
+| Method | Requires | Best for |
+|---|---|---|
+| **Option A — Caddy + domain** | Public IP, domain name, ports 80/443 open | Production, sharing with others |
+| **Option B — Tailscale serve** | Tailscale installed on server and client | Personal / homelab, no domain needed |
 
 ---
 
-## What you need
+## Option B — Tailscale serve (easiest, no domain required)
+
+If you have Tailscale installed on both your server and your devices, this is the simplest path. You get automatic HTTPS with a valid TLS certificate and zero open firewall ports.
+
+### 1. Install Tailscale on the server
+
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+```
+
+### 2. Enable MagicDNS and HTTPS certificates
+
+In the [Tailscale admin console](https://login.tailscale.com/admin/dns):
+- Turn on **MagicDNS**
+- Turn on **HTTPS Certificates**
+
+### 3. Start ServerKit
+
+```bash
+npm run build && npm start   # or: docker compose up -d
+```
+
+### 4. Expose via Tailscale serve
+
+```bash
+tailscale serve --bg http://localhost:3000
+```
+
+Tailscale provisions a TLS certificate automatically. Your panel is now reachable at:
+
+```
+https://<your-machine-name>.<tailnet-name>.ts.net
+```
+
+### 5. Install Tailscale on your devices
+
+- **iOS / iPadOS** — [Tailscale on the App Store](https://apps.apple.com/app/tailscale/id1470499037)
+- **Android** — Tailscale on Google Play
+- **macOS / Windows / Linux** — tailscale.com/download
+
+Connect each device to your Tailscale account and the ServerKit URL works immediately — no port forwarding, no VPN config files, no certificates to manage.
+
+---
+
+## Option A — Caddy + public domain
+
+### What you need
 
 - A Linux server with a **public IP address**
 - A **domain name** with an A record pointing to that IP
 - Ports **80** and **443** open in your firewall (UFW)
 - Caddy installed on the server
 
-That's it. Caddy handles HTTPS and TLS certificate renewal automatically.
+Caddy handles HTTPS and TLS certificate renewal automatically.
 
 ---
 
-## Step 1 — Point your domain to the server
+### Step 1 — Point your domain to the server
 
 In your DNS provider's dashboard, create an A record:
 
@@ -34,7 +86,7 @@ ping serverkit.yourdomain.com
 
 ---
 
-## Step 2 — Open firewall ports
+### Step 2 — Open firewall ports
 
 ```bash
 sudo ufw allow 80/tcp    # HTTP (Caddy uses this for ACME challenge)
@@ -47,7 +99,7 @@ sudo ufw reload
 
 ---
 
-## Step 3 — Install Caddy
+### Step 3 — Install Caddy
 
 ```bash
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
@@ -59,7 +111,7 @@ sudo apt install caddy
 
 ---
 
-## Step 4 — Configure Caddy
+### Step 4 — Configure Caddy
 
 Copy the included `Caddyfile` to the system location and edit your domain:
 
@@ -78,7 +130,7 @@ Caddy will automatically obtain a TLS certificate from Let's Encrypt within seco
 
 ---
 
-## Step 5 — Start ServerKit
+### Step 5 — Start ServerKit
 
 ### With Docker (recommended for production)
 
@@ -105,7 +157,7 @@ pm2 save && pm2 startup
 
 ---
 
-## Step 6 — Access from any device
+### Step 6 — Access from any device
 
 Open your browser on **any device, anywhere**:
 
@@ -123,7 +175,7 @@ Sign in with your `SK_PASSWORD`. The session lasts 7 days — you stay logged in
 
 ---
 
-## Security in production
+### Security in production
 
 The following are enforced automatically once the app is running behind Caddy:
 
@@ -154,7 +206,7 @@ JWT_SECRET=paste-the-openssl-output-here
 
 ---
 
-## Updating your domain
+### Updating your domain
 
 If you change your domain later:
 
@@ -162,6 +214,8 @@ If you change your domain later:
 2. Run `sudo systemctl reload caddy`
 3. Update `NEXT_PUBLIC_HOSTNAME` in `.env` to match the new display name
 4. Restart ServerKit
+
+---
 
 ---
 

@@ -19,14 +19,16 @@ A self-hosted Linux server management panel built for homelab and personal serve
 ## Features
 
 - **Real-time system dashboard** — Live CPU, RAM, and disk statistics pushed over WebSocket every 2 seconds, with sparkline history graphs
-- **Docker management** — Inspect, start, stop, restart, and remove containers; view live container logs without leaving the browser
+- **Docker management** — Inspect, start, stop, restart, and remove containers; create new containers via a built-in modal (image pull included); view live logs inline
 - **Media file browser** — Navigate host directories through a path-safe browser that enforces an explicit allowlist of roots, preventing path traversal
 - **Web server overview** — Status panel for Traefik-managed reverse proxy services and TLS certificates
-- **Database panel** — Status and connection overview for PostgreSQL, MySQL, and SQLite instances
-- **Object storage** — MinIO S3-compatible bucket management with credentials display and object counts
+- **Database panel** — Status and connection overview for PostgreSQL, MySQL, and Redis instances running as Docker containers
+- **Object storage** — Full MinIO S3 bucket management: create buckets, delete buckets (with object drain), view object counts and sizes, and copy S3 credentials for external tools
 - **Network monitor** — UFW firewall status and active rules, all listening TCP/UDP ports with their owning processes, and Tailscale VPN status
 - **Browser terminal** — Full PTY session streamed over WebSocket and rendered with xterm.js — no SSH client or key management needed
-- **Settings panel** — Hostname, media roots, Docker socket path, password management, and live system information
+- **Settings panel** — Hostname, media roots, Docker socket path, password management, MinIO credentials, and live system information
+- **Fully responsive** — Works on phones, tablets, iPads, and desktops from 360 px up; sidebar collapses to a slide-in drawer on small screens
+- **Secure by default** — Login rate limiting (5 attempts / IP / 15 min), JWT `httpOnly` sessions, security headers (HSTS, X-Frame-Options, CSP directives), and zero open ports via Tailscale serve
 
 ---
 
@@ -53,15 +55,16 @@ Browser
 │  │  lib/                                          │  │
 │  │  ├── auth.js     JWT signing & verification    │  │
 │  │  ├── docker.js   Container lifecycle via API   │  │
+│  │  ├── minio.js    MinIO S3 bucket management    │  │
 │  │  ├── fs.js       Path-safe directory listing   │  │
 │  │  ├── shell.js    Allowlisted shell commands    │  │
 │  │  └── db.js       Settings & activity log       │  │
 │  └────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────┘
-          │                  │                │
-          ▼                  ▼                ▼
-    Docker daemon       Filesystem        SQLite
-    (docker.sock)       (MEDIA_ROOTS)     (settings, activity)
+          │                  │                │                │
+          ▼                  ▼                ▼                ▼
+    Docker daemon       Filesystem        SQLite           MinIO S3
+    (docker.sock)       (MEDIA_ROOTS)     (settings)       (object storage)
 ```
 
 **Authentication** — A single administrator password is configured in `.env` and can be changed at runtime through the Settings panel. Every request is validated by Next.js middleware that checks a JWT stored in an `httpOnly` cookie. Sessions are signed with HS256 and expire after 7 days.
@@ -111,13 +114,13 @@ For full prerequisites, environment variable reference, and production deploymen
 | Guide | What it covers |
 |---|---|
 | [Installation](docs/installation.md) | Prerequisites, environment setup, password configuration, first login, production deployment |
-| [Remote Access](docs/remote-access.md) | HTTPS setup with Caddy, domain configuration, access from any device |
+| [Remote Access](docs/remote-access.md) | HTTPS via Caddy or Tailscale serve, domain setup, access from any device |
 | [Dashboard](docs/dashboard.md) | Real-time stats, module cards, network I/O, activity log |
-| [Docker](docs/docker.md) | Container list, lifecycle actions, log viewer |
+| [Docker](docs/docker.md) | Container list, lifecycle actions, log viewer, creating new containers |
 | [Media Server](docs/media-server.md) | File browser, breadcrumb navigation, path allowlist configuration |
 | [Web Server](docs/web-server.md) | Traefik reverse proxy, services overview |
-| [Database](docs/database.md) | PostgreSQL, MySQL, and SQLite status panels |
-| [Storage](docs/storage.md) | MinIO S3 buckets, object counts, credentials |
+| [Database](docs/database.md) | PostgreSQL, MySQL, and Redis status panels |
+| [Storage](docs/storage.md) | MinIO S3 buckets — create, delete, object counts, S3 credentials |
 | [Network](docs/network.md) | UFW firewall rules, listening ports, Tailscale |
 | [Terminal](docs/terminal.md) | Browser PTY session, keyboard shortcuts, resize behavior |
 | [Settings](docs/settings.md) | General config, password management, storage credentials, system info |

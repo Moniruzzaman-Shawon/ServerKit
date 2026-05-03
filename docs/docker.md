@@ -18,6 +18,31 @@ sudo usermod -aG docker $USER
 
 ---
 
+## Creating a new container
+
+Click the **New container** button (top-right of the summary row) to open the creation modal.
+
+### Fields
+
+| Field | Required | Description |
+|---|---|---|
+| **Image** | Yes | Docker image name and optional tag, e.g. `nginx:latest`, `postgres:16`, `redis`. |
+| **Container name** | No | A custom name for the container. If left blank, Docker assigns a random name. |
+| **Restart policy** | — | Controls how Docker restarts the container. Defaults to `unless-stopped` (recommended for services). |
+| **Port mappings** | No | One or more `host port → container port` pairs. Click **Add port** to add a row. |
+| **Environment variables** | No | `KEY=value` pairs injected into the container. Click **Add variable** to add a row. |
+| **Volume mounts** | No | `host path : container path` pairs. Click **Add volume** to add a row. |
+
+### Auto-pull
+
+If the specified image is not present on the host, ServerKit automatically pulls it from Docker Hub before starting the container. The button label changes to indicate this is happening. No manual `docker pull` is required.
+
+### After creation
+
+The container list refreshes automatically once the container is running. You can then use the inline action buttons to stop, restart, view logs, or remove it.
+
+---
+
 ## Summary counters
 
 Three counters at the top of the page show at a glance:

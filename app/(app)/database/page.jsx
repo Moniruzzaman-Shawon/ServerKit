@@ -21,7 +21,7 @@ export default function DatabasePage() {
   }, [])
 
   return (
-    <div className="p-5 animate-fadein">
+    <div className="p-4 lg:p-5 animate-fadein">
       <div className="bg-sk-surface border border-sk-border rounded-xl overflow-hidden">
         <div className="px-4 py-2.5 border-b border-sk-border">
           <span className="text-2xs font-medium text-sk-faint uppercase tracking-[.06em]">
@@ -43,7 +43,8 @@ export default function DatabasePage() {
             </pre>
           </div>
         ) : (
-          <table className="w-full text-[12px]">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[500px] text-[12px]">
             <thead>
               <tr>
                 {['Container', 'Image', 'Status', 'Port', 'Uptime'].map(h => (
@@ -66,6 +67,7 @@ export default function DatabasePage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

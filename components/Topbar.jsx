@@ -1,6 +1,6 @@
 'use client'
 import { usePathname } from 'next/navigation'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Menu } from 'lucide-react'
 
 const TITLES = {
   '/dashboard': 'Dashboard',
@@ -15,7 +15,7 @@ const TITLES = {
   '/settings':  'Settings',
 }
 
-export default function Topbar({ uptime }) {
+export default function Topbar({ onMenuClick }) {
   const path = usePathname()
   const title = TITLES[path] || 'ServerKit'
 
@@ -23,16 +23,19 @@ export default function Topbar({ uptime }) {
 
   return (
     <header className="h-[52px] bg-sk-surface border-b border-sk-border
-                       flex items-center px-5 gap-3 flex-shrink-0">
+                       flex items-center px-4 gap-3 flex-shrink-0">
+      {/* Hamburger — mobile / tablet only */}
+      <button
+        onClick={onMenuClick}
+        className="lg:hidden text-sk-muted hover:text-sk-text transition-colors cursor-pointer p-1"
+        aria-label="Open menu"
+      >
+        <Menu size={18} />
+      </button>
+
       <h1 className="text-[14px] font-medium tracking-tight text-sk-text">{title}</h1>
 
       <div className="ml-auto flex items-center gap-2">
-        {uptime && (
-          <div className="flex items-center gap-1.5 font-mono text-[11px] text-sk-faint">
-            <span className="w-1.5 h-1.5 rounded-full bg-sk-green animate-pulse2" />
-            {uptime}
-          </div>
-        )}
         <button
           onClick={reload}
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-sk-border
@@ -40,7 +43,7 @@ export default function Topbar({ uptime }) {
                      transition-all cursor-pointer"
         >
           <RefreshCw size={11} />
-          Refresh
+          <span className="hidden sm:inline">Refresh</span>
         </button>
       </div>
     </header>

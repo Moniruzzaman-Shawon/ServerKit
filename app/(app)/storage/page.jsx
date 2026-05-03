@@ -178,7 +178,7 @@ export default function StoragePage() {
   const totalSize    = buckets.reduce((s, b) => s + (b.sizeBytes || 0), 0)
 
   return (
-    <div className="p-5 animate-fadein">
+    <div className="p-4 lg:p-5 animate-fadein">
       {showCreate && (
         <CreateModal
           onClose={() => setShowCreate(false)}
@@ -194,7 +194,7 @@ export default function StoragePage() {
       )}
 
       {/* Summary */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         {[
           { l: 'Buckets',    v: buckets.length,                c: 'text-sk-orange' },
           { l: 'Objects',    v: totalObjects.toLocaleString(),  c: 'text-sk-purple' },
@@ -237,7 +237,8 @@ export default function StoragePage() {
             {offline ? 'Cannot connect to MinIO.' : 'No buckets yet. Create one to get started.'}
           </div>
         ) : (
-          <table className="w-full text-[12px]">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] text-[12px]">
             <thead>
               <tr>
                 {['Name', 'Objects', 'Size', 'Created', 'Actions'].map(h => (
@@ -278,6 +279,7 @@ export default function StoragePage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 
@@ -286,7 +288,7 @@ export default function StoragePage() {
         <div className="px-4 py-2.5 border-b border-sk-border">
           <span className="text-2xs font-medium text-sk-faint uppercase tracking-[.06em]">S3 Credentials</span>
         </div>
-        <div className="p-4 grid grid-cols-2 gap-3">
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
             { l: 'Endpoint',   v: creds?.endpoint   || 'http://server:9000' },
             { l: 'Access key', v: creds?.accessKey  || 'minioadmin' },

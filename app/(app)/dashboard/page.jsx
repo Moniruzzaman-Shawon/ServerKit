@@ -32,10 +32,10 @@ export default function DashboardPage() {
   const sysDisk   = stats?.disks?.find(d => d.mount === '/')
 
   return (
-    <div className="p-5 animate-fadein">
+    <div className="p-4 lg:p-5 animate-fadein">
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         <StatCard
           label="CPU"
           value={stats ? `${stats.cpu.load}%` : null}
@@ -68,14 +68,14 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 280px' }}>
+      <div className="grid gap-4 grid-cols-1 xl:grid-cols-[1fr_280px]">
 
         {/* Modules */}
         <div>
           <div className="text-2xs font-medium text-sk-faint uppercase tracking-[.06em] mb-3">
             Modules
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
             {MODULES.map(({ key, label, Icon, href, desc }) => (
               <a
                 key={key}

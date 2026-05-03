@@ -55,11 +55,11 @@ export default function MediaPage() {
   }
 
   return (
-    <div className="p-5 animate-fadein">
+    <div className="p-4 lg:p-5 animate-fadein">
 
       {/* Breadcrumb + actions */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-1 text-[12px] text-sk-muted flex-wrap">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+        <div className="flex items-center gap-1 text-[12px] text-sk-muted flex-wrap min-w-0">
           <button onClick={() => navigate(roots[0] || '')} className="hover:text-sk-orange transition-colors cursor-pointer">/</button>
           {segments.map((seg, i) => (
             <span key={i} className="flex items-center gap-1">
@@ -73,7 +73,7 @@ export default function MediaPage() {
             </span>
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
           {roots.length > 1 && roots.map(r => (
             <button
               key={r}

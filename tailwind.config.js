@@ -32,6 +32,9 @@ module.exports = {
       fontSize: {
         '2xs': ['10px', { lineHeight: '14px' }],
       },
+      screens: {
+        '3xl': '1440px',
+      },
       animation: {
         pulse2: 'pulse2 2s ease-in-out infinite',
         fadein: 'fadein 0.15s ease-out',

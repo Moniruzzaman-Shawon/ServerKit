@@ -298,7 +298,7 @@ export default function DockerPage() {
   const running  = containers.filter(c => c.status === 'running').length
 
   return (
-    <div className="p-5 animate-fadein">
+    <div className="p-4 lg:p-5 animate-fadein">
       {showNew && (
         <NewContainerModal
           onClose={() => setShowNew(false)}
@@ -307,7 +307,7 @@ export default function DockerPage() {
       )}
 
       {/* Summary */}
-      <div className="grid grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         {[
           { l: 'Running', v: running,                     c: 'text-sk-green'  },
           { l: 'Stopped', v: containers.length - running, c: 'text-sk-red'    },
@@ -349,7 +349,8 @@ export default function DockerPage() {
             No containers. Click <strong>New container</strong> to create one.
           </div>
         ) : (
-          <table className="w-full text-[12px] border-collapse">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px] text-[12px] border-collapse">
             <thead>
               <tr>
                 {['Container', 'Image', 'Status', 'Ports', 'Actions'].map(h => (
@@ -402,6 +403,7 @@ export default function DockerPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

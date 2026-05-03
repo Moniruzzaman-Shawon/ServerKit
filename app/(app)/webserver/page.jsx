@@ -21,8 +21,8 @@ export default function WebServerPage() {
   }, [])
 
   return (
-    <div className="p-5 animate-fadein">
-      <div className="grid grid-cols-3 gap-3 mb-5">
+    <div className="p-4 lg:p-5 animate-fadein">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div className="bg-sk-surface border border-sk-border rounded-xl px-4 py-3.5">
           <div className="text-2xs font-medium text-sk-faint uppercase tracking-[.06em] mb-2">Reverse proxy</div>
           <div className="flex items-center gap-2">
@@ -58,7 +58,8 @@ export default function WebServerPage() {
             <p className="text-[12px] text-sk-faint mt-1">Deploy Traefik or Nginx via Docker to see routes here.</p>
           </div>
         ) : (
-          <table className="w-full text-[12px]">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[460px] text-[12px]">
             <thead>
               <tr>
                 {['Container', 'Image', 'Status', 'Ports'].map(h => (
@@ -80,6 +81,7 @@ export default function WebServerPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

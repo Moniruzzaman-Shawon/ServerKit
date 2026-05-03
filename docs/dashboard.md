@@ -6,7 +6,7 @@ The Dashboard is the first page you see after logging in. It gives you a live ov
 
 ## System stat cards
 
-Four stat cards run across the top of the page, each updated in real time via WebSocket every 2 seconds.
+Four stat cards run across the top of the page, each updated in real time via WebSocket every 2 seconds. On small screens they display in a 2-column grid; on larger screens all four appear in a single row.
 
 | Card | What it shows |
 |---|---|
@@ -21,7 +21,7 @@ Disk cards do not include sparklines because disk usage changes slowly and does 
 
 ## Module cards
 
-Below the stat cards, six module cards link to the main sections of the panel:
+Below the stat cards, six module cards link to the main sections of the panel. The grid adapts to screen size: 1 column on phones, 2 columns on tablets, and 3 columns on desktop.
 
 | Module | What it covers |
 |---|---|
@@ -44,7 +44,7 @@ Directly below the module cards, a live network widget shows the current inbound
 
 ## Recent activity
 
-The activity panel on the right side of the page shows the last 20 actions logged by the system — container lifecycle events, login attempts, settings changes, and other server-side actions. Each entry shows:
+The activity panel appears to the right of the modules on wide screens, and below them on narrow screens. It shows the last 20 actions logged by the system — container lifecycle events, login attempts, settings changes, and other server-side actions. Each entry shows:
 
 - A colored dot indicating the severity level (info, warning, error)
 - A short description of the event

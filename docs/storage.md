@@ -49,6 +49,12 @@ Update `.env` with your credentials and endpoint, then restart ServerKit.
 
 ---
 
+## Offline warning
+
+If MinIO is unreachable (not running, wrong endpoint, or network issue), the page shows an amber warning banner with the configured endpoint address. Bucket operations are disabled until the connection is restored. Check that MinIO is running and the `MINIO_ENDPOINT` value in `.env` is correct.
+
+---
+
 ## Summary counters
 
 At the top of the Storage page, four counters provide a quick overview:
@@ -58,7 +64,7 @@ At the top of the Storage page, four counters provide a quick overview:
 | **Buckets** | Total number of buckets in the MinIO instance |
 | **Objects** | Total count of objects across all buckets |
 | **Total size** | Combined size of all objects, in human-readable units |
-| **Endpoint** | The configured MinIO API port |
+| **Status** | `Online` (green) or `Offline` (red) — whether MinIO is currently reachable |
 
 ---
 
@@ -71,9 +77,28 @@ The bucket table lists every bucket with:
 | **Name** | Bucket name |
 | **Objects** | Number of objects stored in the bucket |
 | **Size** | Total size of all objects in the bucket |
-| **Access** | `public` or `private` — whether the bucket allows anonymous reads |
 | **Created** | Date the bucket was created |
 | **Actions** | Browse contents or delete the bucket |
+
+---
+
+## Creating a bucket
+
+Click **Create bucket** in the bucket list header. Enter a name that follows S3 naming rules:
+
+- 3–63 characters
+- Lowercase letters, numbers, and hyphens only
+- Must start and end with a letter or number
+
+Click **Create bucket** to confirm. The bucket appears in the list immediately.
+
+---
+
+## Deleting a bucket
+
+Click **Delete** on any bucket row. A confirmation dialog warns that the deletion is permanent and cannot be undone. ServerKit drains all objects inside the bucket before removing it — you do not need to empty it manually first.
+
+> **Warning:** All objects stored in the bucket are permanently deleted. There is no recycle bin or undo.
 
 ---
 

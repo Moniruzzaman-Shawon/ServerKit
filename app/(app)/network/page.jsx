@@ -20,10 +20,10 @@ export default function NetworkPage() {
   }, [])
 
   return (
-    <div className="p-5 animate-fadein">
+    <div className="p-4 lg:p-5 animate-fadein">
 
       {/* Status cards */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div className="bg-sk-surface border border-sk-border rounded-xl px-4 py-3.5">
           <div className="text-2xs font-medium text-sk-faint uppercase tracking-[.06em] mb-2">UFW Firewall</div>
           <div className="flex items-center gap-2">
@@ -57,7 +57,8 @@ export default function NetworkPage() {
           <div className="px-4 py-2.5 border-b border-sk-border flex items-center justify-between">
             <span className="text-2xs font-medium text-sk-faint uppercase tracking-[.06em]">UFW Rules</span>
           </div>
-          <table className="w-full text-[12px]">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[400px] text-[12px]">
             <thead>
               <tr>
                 {['To', 'Action', 'From'].map(h => (
@@ -78,6 +79,7 @@ export default function NetworkPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
@@ -89,7 +91,8 @@ export default function NetworkPage() {
         {loading ? (
           <div className="py-8 text-center text-sk-faint text-sm">Loading…</div>
         ) : (
-          <table className="w-full text-[12px]">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[480px] text-[12px]">
             <thead>
               <tr>
                 {['Port', 'Proto', 'Address', 'Process'].map(h => (
@@ -114,6 +117,7 @@ export default function NetworkPage() {
               )}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
