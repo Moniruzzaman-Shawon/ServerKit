@@ -12,19 +12,20 @@
 
 <br />
 
-A self-hosted Linux server management panel built for homelab and personal server environments. ServerKit consolidates everything you need into a single, browser-based interface — real-time resource monitoring, Docker container management, file browsing, firewall control, S3 object storage, and a full browser terminal — all protected behind a secure, password-authenticated session.
+A self-hosted Linux server management panel built for homelab and personal server environments. ServerKit consolidates everything you need into a single, browser-based interface — real-time resource monitoring, Docker container management, media file streaming, firewall control, S3 object storage, and a full browser terminal — all protected behind a secure, password-authenticated session.
 
 ---
 
 ## Features
 
-- **Real-time system dashboard** — Live CPU, RAM, and disk statistics pushed over WebSocket every 2 seconds, with sparkline history graphs
-- **Docker management** — Inspect, start, stop, restart, and remove containers; create new containers via a built-in modal (image pull included); view live logs inline
-- **Media file browser** — Navigate host directories through a path-safe browser that enforces an explicit allowlist of roots, preventing path traversal
+- **Real-time system dashboard** — Live CPU, RAM, disk, CPU temperature, and GPU power draw pushed every 2 seconds via WebSocket, with sparkline history graphs
+- **Thermal monitoring** — CPU package temperature (via Linux sysfs) and GPU temperature + power draw (via `lm-sensors`); color-coded green → amber → red as heat rises
+- **Docker management** — Inspect, start, stop, restart, and remove containers; create new containers via a built-in modal with auto-pull; view live logs inline
+- **Media file browser & player** — Browse host directories, play videos and audio, preview images, and download files — all in-browser; path traversal protected by an explicit root allowlist
 - **Web server overview** — Status panel for Traefik-managed reverse proxy services and TLS certificates
 - **Database panel** — Status and connection overview for PostgreSQL, MySQL, and Redis instances running as Docker containers
 - **Object storage** — Full MinIO S3 bucket management: create buckets, delete buckets (with object drain), view object counts and sizes, and copy S3 credentials for external tools
-- **Network monitor** — UFW firewall status and active rules, all listening TCP/UDP ports with their owning processes, and Tailscale VPN status
+- **Network monitor** — UFW firewall status, all listening TCP/UDP ports, and a live Tailscale peer map showing every connected device with hostname, IP, OS, and online status
 - **Browser terminal** — Full PTY session streamed over WebSocket and rendered with xterm.js — no SSH client or key management needed
 - **Settings panel** — Hostname, media roots, Docker socket path, password management, MinIO credentials, and live system information
 - **Fully responsive** — Works on phones, tablets, iPads, and desktops from 360 px up; sidebar collapses to a slide-in drawer on small screens
@@ -71,6 +72,8 @@ Browser
 
 **Real-time layer** — Socket.io shares the same HTTP server as Next.js through a custom `server.js` entry point. Two namespaces handle all real-time traffic: `/stats` pushes system telemetry every 2 seconds, and `/terminal` carries bidirectional PTY I/O.
 
+**Thermal layer** — CPU temperature is read directly from `/sys/class/thermal/` (no root required). GPU temperature and power draw are parsed from `sensors -j` (`lm-sensors` package). Both are polled every 3 seconds via a dedicated REST endpoint.
+
 **Security model** — The file browser enforces a strict path allowlist (`MEDIA_ROOTS` environment variable). Shell commands run through a fixed allowlist in `lib/shell.js`; anything outside it is rejected. Docker API calls are scoped to the configured socket path. All routes except `/login` and `/api/auth/login` require a valid JWT.
 
 ---
@@ -83,20 +86,40 @@ Browser
 | Runtime | Node.js 18+ |
 | Real-time transport | Socket.io |
 | Browser terminal | node-pty · xterm.js |
-| System telemetry | systeminformation |
+| System telemetry | systeminformation · lm-sensors |
+| Thermal / power | Linux sysfs · lm-sensors (`sensors -j`) |
 | Docker API | dockerode |
+| Object storage | MinIO JS SDK |
 | Authentication | jose (JWT HS256) |
 | Persistence | better-sqlite3 |
 | Styling | Tailwind CSS |
-| Testing | Vitest |
+
+---
+
+## Requirements
+
+| Requirement | Notes |
+|---|---|
+| **Node.js 18+** | Node 20+ recommended |
+| **Linux** | Ubuntu 22.04 LTS or later recommended |
+| **Docker** | Optional — required for Docker, Web Server, and Database pages |
+| **lm-sensors** | Optional — required for GPU temperature and power monitoring |
+| **Tailscale** | Optional — required for the Tailscale peer map on the Network page |
+
+Install `lm-sensors` if not already present:
+
+```bash
+sudo apt install lm-sensors -y
+sudo sensors-detect --auto
+```
 
 ---
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-username/serverkit.git
-cd serverkit
+git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
+cd ServerKit
 npm install
 cp .env.example .env
 # Open .env and set SK_PASSWORD and JWT_SECRET before continuing
@@ -115,13 +138,13 @@ For full prerequisites, environment variable reference, and production deploymen
 |---|---|
 | [Installation](docs/installation.md) | Prerequisites, environment setup, password configuration, first login, production deployment |
 | [Remote Access](docs/remote-access.md) | HTTPS via Caddy or Tailscale serve, domain setup, access from any device |
-| [Dashboard](docs/dashboard.md) | Real-time stats, module cards, network I/O, activity log |
+| [Dashboard](docs/dashboard.md) | Real-time stats, temperature, GPU power, module cards, network I/O, activity log |
 | [Docker](docs/docker.md) | Container list, lifecycle actions, log viewer, creating new containers |
-| [Media Server](docs/media-server.md) | File browser, breadcrumb navigation, path allowlist configuration |
+| [Media Server](docs/media-server.md) | File browser, video/audio player, image preview, download, path allowlist |
 | [Web Server](docs/web-server.md) | Traefik reverse proxy, services overview |
 | [Database](docs/database.md) | PostgreSQL, MySQL, and Redis status panels |
 | [Storage](docs/storage.md) | MinIO S3 buckets — create, delete, object counts, S3 credentials |
-| [Network](docs/network.md) | UFW firewall rules, listening ports, Tailscale |
+| [Network](docs/network.md) | UFW firewall rules, listening ports, Tailscale peer map |
 | [Terminal](docs/terminal.md) | Browser PTY session, keyboard shortcuts, resize behavior |
 | [Settings](docs/settings.md) | General config, password management, storage credentials, system info |
 
