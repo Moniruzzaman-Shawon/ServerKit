@@ -8,6 +8,8 @@
   <img src="https://img.shields.io/badge/node-%3E%3D18-56d364?style=flat-square&logo=node.js&logoColor=white" alt="node" />
   <img src="https://img.shields.io/badge/platform-Linux-8b949e?style=flat-square&logo=linux&logoColor=white" alt="platform" />
   <img src="https://img.shields.io/badge/Next.js-15-white?style=flat-square&logo=next.js&logoColor=black" alt="nextjs" />
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="docker" />
+  <img src="https://img.shields.io/badge/Nginx-1.27-009639?style=flat-square&logo=nginx&logoColor=white" alt="nginx" />
 </p>
 
 <br />
@@ -36,11 +38,18 @@ A self-hosted Linux server management panel built for homelab and personal serve
 ## System Architecture
 
 ```
-Browser
-  │
-  ├── HTTP + WebSocket
+Browser / Tailscale HTTPS
   │
   ▼
+┌─────────────────────────────────────┐
+│  Nginx 1.27 (port 80)               │
+│  • Reverse proxy                    │
+│  • WebSocket upgrade                │
+│  • SSE / streaming buffering off    │
+│  • 500 MB upload limit              │
+└───────────────┬─────────────────────┘
+                │  http://serverkit:3000
+                ▼
 ┌──────────────────────────────────────────────────────┐
 │  Node.js Custom Server  (server.js)                  │
 │                                                      │
@@ -65,8 +74,10 @@ Browser
           │                  │                │                │
           ▼                  ▼                ▼                ▼
     Docker daemon       Filesystem        SQLite           MinIO S3
-    (docker.sock)       (MEDIA_ROOTS)     (settings)       (object storage)
+    (docker.sock)       (MEDIA_ROOTS)     (settings)       (port 9000)
 ```
+
+**Docker Compose stack** — Three isolated containers share a private `sk-net` bridge network. Nginx is the only container with a public port (80). ServerKit and MinIO are internal-only, communicating by service name. All containers have `restart: unless-stopped` and start automatically on boot with the Docker daemon.
 
 **Authentication** — A single administrator password is configured in `.env` and can be changed at runtime through the Settings panel. Every request is validated by Next.js middleware that checks a JWT stored in an `httpOnly` cookie. Sessions are signed with HS256 and expire after 7 days.
 
@@ -83,7 +94,9 @@ Browser
 | Layer | Technology |
 |---|---|
 | Framework | Next.js 15 (App Router) |
-| Runtime | Node.js 18+ |
+| Runtime | Node.js 20 (Alpine) |
+| Reverse proxy | Nginx 1.27 |
+| Containerization | Docker Compose |
 | Real-time transport | Socket.io |
 | Browser terminal | node-pty · xterm.js |
 | System telemetry | systeminformation · lm-sensors |
@@ -100,29 +113,49 @@ Browser
 
 | Requirement | Notes |
 |---|---|
-| **Node.js 18+** | Node 20+ recommended |
+| **Docker** | Required for the recommended Docker Compose deployment |
+| **Docker Compose** | v2 plugin (`docker compose`) — installed alongside Docker Engine |
 | **Linux** | Ubuntu 22.04 LTS or later recommended |
-| **Docker** | Optional — required for Docker, Web Server, and Database pages |
-| **lm-sensors** | Optional — required for GPU temperature and power monitoring |
-| **Tailscale** | Optional — required for the Tailscale peer map on the Network page |
-
-Install `lm-sensors` if not already present:
-
-```bash
-sudo apt install lm-sensors -y
-sudo sensors-detect --auto
-```
+| **Tailscale** | Optional — required for zero-config remote access and the Tailscale peer map |
+| **lm-sensors** | Optional on host — included in the Docker image; needed only for bare-metal installs |
 
 ---
 
-## Quick Start
+## Quick Start (Docker — recommended)
+
+```bash
+git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
+cd ServerKit
+cp .env.example .env
+```
+
+Open `.env` and set at minimum:
+
+```env
+SK_PASSWORD=your-strong-password
+JWT_SECRET=a-long-random-secret   # openssl rand -hex 32
+```
+
+Then start the stack:
+
+```bash
+docker compose up -d
+```
+
+Open `http://localhost` (port 80) and sign in. The stack auto-starts on every boot — no manual steps needed after the first run.
+
+> For Tailscale remote access, see the [Remote Access guide](docs/remote-access.md).
+
+---
+
+## Quick Start (bare-metal / dev)
 
 ```bash
 git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
 cd ServerKit
 npm install
 cp .env.example .env
-# Open .env and set SK_PASSWORD and JWT_SECRET before continuing
+# Edit .env — set SK_PASSWORD and JWT_SECRET
 npm run dev
 ```
 
@@ -136,8 +169,8 @@ For full prerequisites, environment variable reference, and production deploymen
 
 | Guide | What it covers |
 |---|---|
-| [Installation](docs/installation.md) | Prerequisites, environment setup, password configuration, first login, production deployment |
-| [Remote Access](docs/remote-access.md) | HTTPS via Caddy or Tailscale serve, domain setup, access from any device |
+| [Installation](docs/installation.md) | Prerequisites, Docker Compose setup, bare-metal setup, environment variables, first login |
+| [Remote Access](docs/remote-access.md) | HTTPS via Tailscale serve or Caddy, access from any device |
 | [Dashboard](docs/dashboard.md) | Real-time stats, temperature, GPU power, module cards, network I/O, activity log |
 | [Docker](docs/docker.md) | Container list, lifecycle actions, log viewer, creating new containers |
 | [Media Server](docs/media-server.md) | File browser, video/audio player, image preview, download, path allowlist |

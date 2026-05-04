@@ -29,13 +29,13 @@ In the [Tailscale admin console](https://login.tailscale.com/admin/dns):
 ### 3. Start ServerKit
 
 ```bash
-npm run build && npm start   # or: docker compose up -d
+docker compose up -d
 ```
 
 ### 4. Expose via Tailscale serve
 
 ```bash
-tailscale serve --bg http://localhost:3000
+tailscale serve --bg http://localhost:80
 ```
 
 Tailscale provisions a TLS certificate automatically. Your panel is now reachable at:
@@ -132,12 +132,20 @@ Caddy will automatically obtain a TLS certificate from Let's Encrypt within seco
 
 ### Step 5 — Start ServerKit
 
-### With Docker (recommended for production)
+### With Docker (recommended)
 
 ```bash
 cp .env.example .env
 nano .env   # Set SK_PASSWORD and JWT_SECRET
 docker compose up -d
+```
+
+Then point Caddy to port 80 (Nginx):
+
+```
+serverkit.yourdomain.com {
+    reverse_proxy localhost:80
+}
 ```
 
 ### Without Docker
