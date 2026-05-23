@@ -61,6 +61,7 @@ services:
       - MINIO_USER=${MINIO_USER:-minioadmin}
       - MINIO_PASS=${MINIO_PASS:-minioadmin}
       - NODE_ENV=production
+      - COOKIE_SECURE=${COOKIE_SECURE:-false}
 
   # ── MinIO — S3-compatible object storage ──────────────────────────────────
   minio:

@@ -70,16 +70,18 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Logo */}
         <div className="px-4 pt-4 pb-3 border-b border-sk-subtle flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 320 160"
-              className="w-[140px] 3xl:w-[160px] h-auto"
-              style={{ overflow: 'visible' }}
-              aria-label="ServerKit"
-            >
-              <text x="16" y="98" fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" fontSize="96" fontWeight="800" fill="#eef0f4" letterSpacing="-4">Server</text>
-              <text x="16" y="155" fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" fontSize="96" fontWeight="300" fill="#f97316" letterSpacing="-3">Kit</text>
-            </svg>
+            <Link href="/dashboard" aria-label="Go to dashboard">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 320 160"
+                className="w-[140px] 3xl:w-[160px] h-auto opacity-90 hover:opacity-100 transition-opacity"
+                style={{ overflow: 'visible' }}
+                aria-hidden="true"
+              >
+                <text x="16" y="98" fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" fontSize="96" fontWeight="800" fill="#eef0f4" letterSpacing="-4">Server</text>
+                <text x="16" y="155" fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" fontSize="96" fontWeight="300" fill="#f97316" letterSpacing="-3">Kit</text>
+              </svg>
+            </Link>
             <div className="text-[11px] text-sk-faint mt-1.5">
               {process.env.NEXT_PUBLIC_HOSTNAME || 'my-linux-server'}
             </div>

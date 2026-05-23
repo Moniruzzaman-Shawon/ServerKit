@@ -23,7 +23,7 @@ app.prepare().then(() => {
   setupPty(io)
 
   const port = parseInt(process.env.PORT || '3000', 10)
-  httpServer.listen(port, () => {
+  httpServer.listen(port, '0.0.0.0', () => {
     console.log(`\x1b[32m✓\x1b[0m ServerKit ready on \x1b[36mhttp://localhost:${port}\x1b[0m`)
   })
 })
