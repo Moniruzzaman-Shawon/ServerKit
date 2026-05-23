@@ -123,27 +123,30 @@ Browser / Tailscale HTTPS
 
 ## Quick Start (Docker — recommended)
 
+**One-command install** (handles `.env`, auto-generates secrets, builds, and starts):
+
+```bash
+git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
+cd ServerKit
+bash install.sh
+```
+
+Or manually:
+
 ```bash
 git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
 cd ServerKit
 cp .env.example .env
-```
-
-Open `.env` and set at minimum:
-
-```env
-SK_PASSWORD=your-strong-password
-JWT_SECRET=a-long-random-secret   # openssl rand -hex 32
-```
-
-Then start the stack:
-
-```bash
+# Edit .env — set SK_PASSWORD and JWT_SECRET (openssl rand -hex 32)
 docker compose up -d
 ```
 
-Open `http://localhost` (port 80) and sign in. The stack auto-starts on every boot — no manual steps needed after the first run.
+Open `http://localhost` (port 80) and sign in. The stack auto-starts on every boot.
 
+> **Cloud VM?** Remove the sysfs volume mounts in `docker-compose.yml` — thermal/GPU cards will show "No sensor detected" cleanly, but everything else (Docker, terminal, storage, media) works fine.
+>
+> **HTTPS?** Set `COOKIE_SECURE=true` in `.env` after adding a TLS reverse proxy (Caddy or Nginx + Let's Encrypt).
+>
 > For Tailscale remote access, see the [Remote Access guide](docs/remote-access.md).
 
 ---

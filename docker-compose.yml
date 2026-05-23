@@ -38,14 +38,12 @@ services:
       - ./data:/app/data
 
       # Thermal monitoring — CPU temp via Linux sysfs (no root needed)
+      # Optional: remove these three lines on cloud VMs / bare-metal installs without sensors
       - /sys/class/thermal:/sys/class/thermal:ro
-      # GPU temp + power via lm-sensors (reads /sys/class/hwmon)
       - /sys/class/hwmon:/sys/class/hwmon:ro
       - /sys/devices:/sys/devices:ro
 
-      # Tailscale — mount the host socket + binary so the Network page
-      # can show Tailscale peers. The Go binary is statically linked
-      # and runs fine inside Alpine.
+      # Tailscale — optional; remove if Tailscale is not installed on this host
       - /var/run/tailscale:/var/run/tailscale
       - /usr/bin/tailscale:/usr/bin/tailscale:ro
 

@@ -83,8 +83,12 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Temperature"
-          value={thermal?.cpu != null ? `${thermal.cpu}°C` : null}
-          sub={thermal?.gpu != null ? `GPU ${thermal.gpu}°C` : (thermal ? 'GPU —' : 'Loading…')}
+          value={thermal?.cpu != null ? `${thermal.cpu}°C` : (thermal ? 'N/A' : null)}
+          sub={
+            !thermal ? 'Loading…' :
+            thermal.cpu == null ? 'No sensor detected' :
+            thermal.gpu != null ? `GPU ${thermal.gpu}°C` : 'GPU —'
+          }
           pct={thermal?.cpu != null ? Math.min(100, thermal.cpu) : 0}
           color={
             (thermal?.cpu ?? 0) >= 80 ? '#f85149' :
@@ -94,8 +98,12 @@ export default function DashboardPage() {
         />
         <StatCard
           label="GPU Power"
-          value={thermal?.gpuWatts != null ? `${thermal.gpuWatts}W` : null}
-          sub={thermal?.gpuWattsCap != null ? `of ${thermal.gpuWattsCap}W cap` : (thermal ? 'No GPU data' : 'Loading…')}
+          value={thermal?.gpuWatts != null ? `${thermal.gpuWatts}W` : (thermal ? 'N/A' : null)}
+          sub={
+            !thermal ? 'Loading…' :
+            thermal.gpuWatts == null ? 'No GPU detected' :
+            thermal.gpuWattsCap != null ? `of ${thermal.gpuWattsCap}W cap` : 'No cap data'
+          }
           pct={
             thermal?.gpuWatts != null && thermal?.gpuWattsCap
               ? Math.round((thermal.gpuWatts / thermal.gpuWattsCap) * 100)
