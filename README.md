@@ -35,6 +35,246 @@ A self-hosted Linux server management panel built for homelab and personal serve
 
 ---
 
+## Requirements
+
+| Requirement | Notes |
+|---|---|
+| **Docker** | Required — [install guide](https://docs.docker.com/engine/install/) |
+| **Docker Compose** | v2 plugin (`docker compose`) — installed alongside Docker Engine |
+| **Linux** | Ubuntu 22.04 LTS or later recommended |
+| **Tailscale** | Optional — for zero-config remote access and the Tailscale peer map |
+| **lm-sensors** | Optional — included in the Docker image; needed only for bare-metal installs |
+
+---
+
+## Installation
+
+### Option 1 — Automated (recommended)
+
+Clone the repo and run the installer. It checks prerequisites, prompts for a password, auto-generates a JWT secret, and starts the stack.
+
+```bash
+git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
+cd ServerKit
+bash install.sh
+```
+
+Open `http://localhost` and sign in with the password you chose.
+
+---
+
+### Option 2 — Manual (Docker Compose)
+
+**1. Clone and configure**
+
+```bash
+git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
+cd ServerKit
+cp .env.example .env
+```
+
+**2. Edit `.env`**
+
+Open `.env` in any editor and set the two required values:
+
+```env
+SK_PASSWORD=your-strong-password
+JWT_SECRET=                        # generate with: openssl rand -hex 32
+```
+
+**3. Start the stack**
+
+```bash
+docker compose up -d
+```
+
+Open `http://localhost` (port 80) and sign in.
+
+---
+
+### Option 3 — Bare-metal / Development
+
+```bash
+git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
+cd ServerKit
+npm install
+cp .env.example .env
+# Edit .env — set SK_PASSWORD and JWT_SECRET
+npm run dev        # dev mode with live reload
+# or:
+npm run build && npm start   # production mode
+```
+
+Open `http://localhost:3000` and sign in with your `SK_PASSWORD`.
+
+---
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `SK_PASSWORD` | Yes | — | Login password |
+| `JWT_SECRET` | Yes | — | HS256 signing secret (`openssl rand -hex 32`) |
+| `NEXT_PUBLIC_HOSTNAME` | No | `my-linux-server` | Display name shown in the UI |
+| `PORT` | No | `3000` | Internal Node.js port |
+| `MEDIA_ROOTS` | No | `/mnt/media,/mnt/webserver` | Comma-separated paths for the media browser |
+| `DOCKER_SOCKET` | No | `/var/run/docker.sock` | Docker daemon socket path |
+| `MINIO_ENDPOINT` | No | `http://minio:9000` | MinIO S3 endpoint |
+| `MINIO_USER` | No | `minioadmin` | MinIO root username |
+| `MINIO_PASS` | No | `minioadmin` | MinIO root password |
+| `COOKIE_SECURE` | No | `false` | Set `true` only when serving over HTTPS |
+| `DB_PATH` | No | `./data/serverkit.db` | SQLite database path |
+
+---
+
+### Cloud VM Notes
+
+ServerKit works on any VPS (DigitalOcean, Hetzner, AWS EC2, etc.) with Docker installed. The only difference from bare-metal is that thermal/GPU sensors won't be available.
+
+Remove the sysfs volume mounts from `docker-compose.yml` before starting:
+
+```yaml
+# Remove or comment out these lines:
+# - /sys/class/thermal:/sys/class/thermal:ro
+# - /sys/class/hwmon:/sys/class/hwmon:ro
+# - /sys/devices:/sys/devices:ro
+```
+
+The temperature and GPU power cards will display "No sensor detected" — everything else works normally.
+
+---
+
+### Enabling HTTPS
+
+To serve over HTTPS (required if `COOKIE_SECURE=true`), put Caddy or Nginx in front as a reverse proxy.
+
+**Caddy example** (auto HTTPS with Let's Encrypt):
+
+```
+yourdomain.com {
+    reverse_proxy localhost:80
+}
+```
+
+Then set in `.env`:
+
+```env
+COOKIE_SECURE=true
+```
+
+And restart: `docker compose up -d`
+
+---
+
+## Usage
+
+### Logging In
+
+Navigate to `http://<your-server-ip>` and enter your `SK_PASSWORD`. Sessions last 7 days. The logo in the top-left of the sidebar returns you to the dashboard from any page.
+
+---
+
+### Dashboard
+
+The dashboard gives you a live overview of your server at a glance:
+
+- **Stat cards** (top row) — CPU load, RAM usage, disk usage, CPU temperature, GPU power draw — all updated every 2 seconds
+- **Module cards** — quick links to each section of ServerKit
+- **Network I/O** — live inbound/outbound throughput on the primary interface
+- **Activity feed** — the last 30 events logged across all modules (container actions, setting changes, etc.)
+
+---
+
+### Docker
+
+Manage all containers on your host:
+
+| Action | How |
+|---|---|
+| View containers | Navigate to **Docker** — all containers listed with status, image, ports |
+| Start / Stop / Restart | Click the action buttons in the container row |
+| View logs | Click **Logs** on any container — shows the last 80 lines |
+| Remove a container | Click **Remove** (stopped containers only) |
+| Create a new container | Click **New Container** — enter image name, optional name/ports/env vars, click **Create** (image is auto-pulled if not present) |
+
+---
+
+### Media Browser
+
+Browse and play files from the paths defined in `MEDIA_ROOTS`:
+
+- Navigate directories with the breadcrumb path bar
+- Click any **video or audio file** to open the in-browser player
+- Click any **image** to open the preview modal
+- Click **Download** on any file to save it locally
+- Access is restricted to `MEDIA_ROOTS` — no path traversal outside those roots
+
+To change the media roots at runtime, go to **Settings → General → Media Roots**.
+
+---
+
+### Terminal
+
+A full shell session directly in your browser:
+
+- Navigate to **Terminal** — a PTY session opens automatically
+- Runs `bash` (or the default shell) as the container user
+- The terminal resizes automatically with your browser window
+- Close the tab or navigate away to end the session
+
+---
+
+### Storage (MinIO S3)
+
+Manage S3-compatible object storage:
+
+| Action | How |
+|---|---|
+| List buckets | Navigate to **Storage** |
+| Create a bucket | Click **New Bucket** — name must be 3–63 lowercase alphanumeric characters or hyphens |
+| Delete a bucket | Click **Delete** — all objects are drained first |
+| Get S3 credentials | Shown on the Storage page — copy endpoint, access key, and secret key for use in external tools (e.g. `rclone`, `aws-cli`, Cyberduck) |
+
+---
+
+### Network
+
+- **Firewall** — UFW status and all active rules
+- **Open ports** — every listening TCP/UDP port on the host with process name
+- **Tailscale peers** — all devices on your Tailscale network with hostname, IP addresses, OS, and online status (requires Tailscale installed on the host)
+
+---
+
+### Settings
+
+| Tab | What you can change |
+|---|---|
+| **General** | Display hostname, media root paths, Docker socket path |
+| **Security** | Change login password (requires current password, minimum 8 characters) |
+| **Storage** | MinIO endpoint, access credentials |
+| **About** | OS version, CPU model, Node.js version, ServerKit version |
+
+---
+
+## Maintenance
+
+```bash
+# Stop all services
+docker compose down
+
+# View live logs
+docker compose logs -f serverkit
+
+# Update to the latest version
+git pull
+docker compose up -d --build
+
+# Back up settings and activity log
+cp -r ./data ./data.bak
+```
+
+---
+
 ## System Architecture
 
 ```
@@ -77,16 +317,6 @@ Browser / Tailscale HTTPS
     (docker.sock)       (MEDIA_ROOTS)     (settings)       (port 9000)
 ```
 
-**Docker Compose stack** — Three isolated containers share a private `sk-net` bridge network. Nginx is the only container with a public port (80). ServerKit and MinIO are internal-only, communicating by service name. All containers have `restart: unless-stopped` and start automatically on boot with the Docker daemon.
-
-**Authentication** — A single administrator password is configured in `.env` and can be changed at runtime through the Settings panel. Every request is validated by Next.js middleware that checks a JWT stored in an `httpOnly` cookie. Sessions are signed with HS256 and expire after 7 days.
-
-**Real-time layer** — Socket.io shares the same HTTP server as Next.js through a custom `server.js` entry point. Two namespaces handle all real-time traffic: `/stats` pushes system telemetry every 2 seconds, and `/terminal` carries bidirectional PTY I/O.
-
-**Thermal layer** — CPU temperature is read directly from `/sys/class/thermal/` (no root required). GPU temperature and power draw are parsed from `sensors -j` (`lm-sensors` package). Both are polled every 3 seconds via a dedicated REST endpoint.
-
-**Security model** — The file browser enforces a strict path allowlist (`MEDIA_ROOTS` environment variable). Shell commands run through a fixed allowlist in `lib/shell.js`; anything outside it is rejected. Docker API calls are scoped to the configured socket path. All routes except `/login` and `/api/auth/login` require a valid JWT.
-
 ---
 
 ## Tech Stack
@@ -106,65 +336,6 @@ Browser / Tailscale HTTPS
 | Authentication | jose (JWT HS256) |
 | Persistence | better-sqlite3 |
 | Styling | Tailwind CSS |
-
----
-
-## Requirements
-
-| Requirement | Notes |
-|---|---|
-| **Docker** | Required for the recommended Docker Compose deployment |
-| **Docker Compose** | v2 plugin (`docker compose`) — installed alongside Docker Engine |
-| **Linux** | Ubuntu 22.04 LTS or later recommended |
-| **Tailscale** | Optional — required for zero-config remote access and the Tailscale peer map |
-| **lm-sensors** | Optional on host — included in the Docker image; needed only for bare-metal installs |
-
----
-
-## Quick Start (Docker — recommended)
-
-**One-command install** (handles `.env`, auto-generates secrets, builds, and starts):
-
-```bash
-git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
-cd ServerKit
-bash install.sh
-```
-
-Or manually:
-
-```bash
-git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
-cd ServerKit
-cp .env.example .env
-# Edit .env — set SK_PASSWORD and JWT_SECRET (openssl rand -hex 32)
-docker compose up -d
-```
-
-Open `http://localhost` (port 80) and sign in. The stack auto-starts on every boot.
-
-> **Cloud VM?** Remove the sysfs volume mounts in `docker-compose.yml` — thermal/GPU cards will show "No sensor detected" cleanly, but everything else (Docker, terminal, storage, media) works fine.
->
-> **HTTPS?** Set `COOKIE_SECURE=true` in `.env` after adding a TLS reverse proxy (Caddy or Nginx + Let's Encrypt).
->
-> For Tailscale remote access, see the [Remote Access guide](docs/remote-access.md).
-
----
-
-## Quick Start (bare-metal / dev)
-
-```bash
-git clone https://github.com/Moniruzzaman-Shawon/ServerKit.git
-cd ServerKit
-npm install
-cp .env.example .env
-# Edit .env — set SK_PASSWORD and JWT_SECRET
-npm run dev
-```
-
-Open `http://localhost:3000` and sign in with your `SK_PASSWORD`.
-
-For full prerequisites, environment variable reference, and production deployment instructions, see the **[Installation Guide](docs/installation.md)**.
 
 ---
 
